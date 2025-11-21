@@ -55,4 +55,32 @@ public class AuthController {
         model.addAttribute("error", "Email ou mot de passe incorrect");
         return "Login";
     }
+
+    @GetMapping("/register")
+    public String ShowRegister(){
+        return "Register";
+
+    }
+    @PostMapping("/register")
+    public String registerUser(@RequestParam String userName ,@RequestParam String userMail , @RequestParam String userPWD, Model model){
+      if(userRepository.findByUserMail(userMail).isPresent()){
+          model.addAttribute("error", "Cet email est deja utilisé !");
+          return "Register";
+      }
+
+      UserEntity newUser = new UserEntity();
+      newUser.setUserName(userName);
+      newUser.setUserMail(userMail);
+
+      String encodedPassword = passwordEncoder.encode(userPWD);
+      newUser.setUserPWD(encodedPassword);
+
+      newUser.setLevel("deb");
+      newUser.setUserBadge("Novice");
+      newUser.setUserDate(java.time.LocalDate.now());
+
+      userRepository.save(newUser);
+
+  return "redirect:/Auth/login";
+    }
 }
