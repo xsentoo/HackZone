@@ -7,6 +7,7 @@ import com.uphf.HackZone.Repository.UserRepository;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,10 +23,12 @@ import java.util.Optional;
 public class AuthController {
     private final UserRepository userRepository;
     private final JwtUtil JwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthController(UserRepository userRepository , JwtUtil jwtUtil) {
+    public AuthController(UserRepository userRepository , JwtUtil jwtUtil, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.JwtUtil = jwtUtil;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/login")
@@ -37,7 +40,7 @@ public class AuthController {
     public String LoginUser(@RequestParam String userMail , @RequestParam String userPWD , Model model, HttpServletResponse response){
         Optional<UserEntity> user = userRepository.findByUserMail(userMail);
         // il faut ajouter BCryptPasswordEncoder sinon si ya un ijection sql c mort parce que userPWD est visible
-        if (user.isPresent() && user.get().getUserPWD().equals(userPWD)) {
+        if (user.isPresent() && passwordEncoder.matches(userPWD,user.get().getUserPWD())) {
             String token = JwtUtil.generateToken(userMail);
 
             // je cree un cookie pour stocker le tocken si on cree pas un cookie si utilisateur va dans un autre page token sera perdu
