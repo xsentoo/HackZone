@@ -163,4 +163,5 @@ Fonctionnalités en cours :
 
 Projet développé par  
 **Senthooran Thayaparan** 
+**et**
 **Ibrahim Kamisokko**
