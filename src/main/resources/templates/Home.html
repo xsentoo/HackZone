@@ -1,10 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-<h1>Bienvenue </h1>
+<html xmlns:th="http://www.thymeleaf.org"> <body>
+<h1>Bienvenue, <span th:text="${user.userName}">Utilisateur</span> !</h1>
+<p>Ton niveau : <span th:text="${user.level}">Débutant</span></p>
 </body>
 </html>

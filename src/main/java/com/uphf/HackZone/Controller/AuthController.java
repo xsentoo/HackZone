@@ -5,6 +5,8 @@ import com.uphf.HackZone.Component.JwtUtil;
 import com.uphf.HackZone.Entity.UserEntity;
 import com.uphf.HackZone.Repository.UserRepository;
 import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,13 +34,20 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String LoginUser(@RequestParam String userMail ,@RequestParam String userPWD , Model model){
+    public String LoginUser(@RequestParam String userMail , @RequestParam String userPWD , Model model, HttpServletResponse response){
         Optional<UserEntity> user = userRepository.findByUserMail(userMail);
+        // il faut ajouter BCryptPasswordEncoder sinon si ya un ijection sql c mort parce que userPWD est visible
         if (user.isPresent() && user.get().getUserPWD().equals(userPWD)) {
             String token = JwtUtil.generateToken(userMail);
-            model.addAttribute("token", token);
-            model.addAttribute("user",user.get());
-            return "Home";
+
+            // je cree un cookie pour stocker le tocken si on cree pas un cookie si utilisateur va dans un autre page token sera perdu
+            Cookie cookie = new Cookie("Authorization", token);
+            cookie.setHttpOnly(true);
+            cookie.setPath("/");
+            cookie.setMaxAge(60*60);
+
+            response.addCookie(cookie);
+            return "redirect:/Home";
         }
         model.addAttribute("error", "Email ou mot de passe incorrect");
         return "Login";
