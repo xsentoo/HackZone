@@ -12,19 +12,27 @@
         }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; }
 
+        /* --- HEADER --- */
         header { background-color: var(--card-bg); padding: 15px 30px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
         .logo { font-size: 1.5rem; font-weight: bold; color: var(--accent-green); letter-spacing: 1px; }
         .logout-btn { color: #f85149; text-decoration: none; font-weight: bold; border: 1px solid #f85149; padding: 5px 15px; border-radius: 5px; transition: 0.3s; font-size: 0.9rem; }
         .logout-btn:hover { background: #f85149; color: white; }
 
+        /* --- LAYOUT --- */
         .main-layout { display: grid; grid-template-columns: 3fr 1fr; gap: 30px; max-width: 1400px; margin: 40px auto; padding: 0 20px; }
 
         .section-title { margin-top: 0; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; color: var(--text-main); }
+
+        /* --- ALERTES & VALIDATION --- */
+        .alert { padding: 10px; border-radius: 5px; margin-bottom: 20px; border: 1px solid; font-size: 0.9rem; }
+        .alert-success { background: rgba(46, 160, 67, 0.15); border-color: #2ea043; color: #3fb950; }
+        .alert-error { background: rgba(248, 81, 73, 0.15); border-color: #f85149; color: #ff7b72; }
 
         .validation-box { background: var(--card-bg); padding: 20px; border-radius: 10px; border: 1px solid var(--border-color); margin-bottom: 30px; display: flex; gap: 15px; align-items: center; }
         .input-flag { background: #0d1117; border: 1px solid var(--border-color); color: white; padding: 10px; border-radius: 5px; flex-grow: 1; }
         .btn-validate { background: var(--accent-green); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
 
+        /* --- GRILLE DES ATTAQUES --- */
         .attack-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         .card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; transition: transform 0.2s, border-color 0.2s; position: relative; }
         .card:hover { transform: translateY(-3px); border-color: var(--accent-blue); }
@@ -34,27 +42,26 @@
         .difficulty { display: inline-block; margin-top: 10px; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; border: 1px solid var(--border-color); background: #21262d; }
         .card-link { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
+        /* --- SIDEBAR DROITE --- */
         .sidebar-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
         .user-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
         .avatar-circle { width: 50px; height: 50px; background: var(--accent-blue); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; color: white; }
         .user-details h3 { margin: 0; font-size: 1.1rem; }
         .user-details span { color: var(--text-secondary); font-size: 0.9rem; }
 
+        /* Barre de progression */
         .progress-container { margin-top: 15px; }
         .progress-info { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 5px; color: var(--text-secondary); }
         .progress-track { width: 100%; height: 8px; background: var(--progress-bg); border-radius: 4px; overflow: hidden; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent-green), #2ea043); width: 0%; transition: width 1s ease-in-out; }
 
+        /* Mini Classement */
         .mini-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
         .mini-table td { padding: 8px 0; border-bottom: 1px solid #21262d; }
         .mini-table tr:last-child td { border-bottom: none; }
         .rank-num { font-weight: bold; width: 20px; color: var(--text-secondary); }
         .rank-1 { color: #ffd700; }
         .user-points { text-align: right; font-weight: bold; color: var(--accent-green); }
-
-        .alert { padding: 10px; border-radius: 5px; margin-bottom: 20px; border: 1px solid; font-size: 0.9rem; }
-        .alert-success { background: rgba(46, 160, 67, 0.15); border-color: #2ea043; color: #3fb950; }
-        .alert-error { background: rgba(248, 81, 73, 0.15); border-color: #f85149; color: #ff7b72; }
     </style>
 </head>
 <body>
@@ -70,11 +77,16 @@
 </header>
 
 <div class="main-layout">
+
     <main>
         <h2 class="section-title">Opérations en cours</h2>
 
-        <div th:if="${param.success}" class="alert alert-success"><i class="fas fa-check-circle"></i> <span th:text="${param.success}"></span></div>
-        <div th:if="${param.error}" class="alert alert-error"><i class="fas fa-times-circle"></i> <span th:text="${param.error}"></span></div>
+        <div th:if="${param.success}" class="alert alert-success">
+            <i class="fas fa-check-circle"></i> <span th:text="${param.success}"></span>
+        </div>
+        <div th:if="${param.error}" class="alert alert-error">
+            <i class="fas fa-times-circle"></i> <span th:text="${param.error}"></span>
+        </div>
 
         <div class="validation-box">
             <i class="fas fa-flag" style="color: #d29922; font-size: 1.5rem;"></i>
@@ -85,13 +97,16 @@
         </div>
 
         <div class="attack-grid">
+
             <div class="card">
                 <div class="card-icon"><i class="fas fa-database"></i></div>
                 <h3>Injection SQL</h3>
                 <p>Piratez la base de données de la banque cible.</p>
                 <span class="difficulty easy" style="color:#2ea043; border-color:#2ea043">Facile</span>
-                <a href="/Challenge/SQL1" class="card-link"></a>
+
+                <a href="/learn/SQL" class="card-link"></a>
             </div>
+
             <div class="card">
                 <div class="card-icon"><i class="fas fa-code"></i></div>
                 <h3>Faille XSS</h3>
@@ -99,18 +114,28 @@
                 <span class="difficulty medium" style="color:#d29922; border-color:#d29922">Moyen</span>
                 <a href="http://localhost:8081" target="_blank" class="card-link"></a>
             </div>
+
+            <div class="card" style="opacity: 0.5;">
+                <div class="card-icon"><i class="fas fa-lock"></i></div>
+                <h3>Brute Force</h3>
+                <p>Bientôt disponible...</p>
+                <span class="difficulty easy">Facile</span>
+            </div>
         </div>
     </main>
 
     <aside>
         <div class="sidebar-card">
             <div class="user-header">
-                <div class="avatar-circle"><i class="fas fa-user"></i></div>
+                <div class="avatar-circle">
+                    <i class="fas fa-user"></i>
+                </div>
                 <div class="user-details">
                     <h3 th:text="${user.userName}">Pseudo</h3>
                     <span th:text="${user.level}">Niveau</span>
                 </div>
             </div>
+
             <div class="progress-container">
                 <div class="progress-info">
                     <span>Progression Niv. Suivant</span>
@@ -131,13 +156,17 @@
             </h3>
             <table class="mini-table">
                 <tr th:each="player, iterStat : ${leaderboard}">
-                    <td class="rank-num" th:classappend="${iterStat.count == 1} ? 'rank-1' : ''" th:text="${iterStat.count}">1</td>
+                    <td class="rank-num" th:classappend="_{iterStat.count == 1} ? 'rank-1' : ''" th:text="${iterStat.count}">1</td>
                     <td th:text="${player.userName}" th:style="${player.userName == user.userName} ? 'color:white; font-weight:bold;' : ''">Nom</td>
                     <td class="user-points" th:text="${player.point}">0</td>
                 </tr>
             </table>
+            <div style="text-align: center; margin-top: 15px;">
+                <a href="/Leaderboard" style="color: var(--text-secondary); font-size: 0.8rem; text-decoration: none;">Voir tout le classement</a>
+            </div>
         </div>
     </aside>
+
 </div>
 
 </body>

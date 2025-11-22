@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Sélection du Niveau</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body { background: #0d1117; color: #c9d1d9; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+    .container { max-width: 800px; margin: 50px auto; padding: 20px; }
+    h1 { color: #58a6ff; border-bottom: 1px solid #30363d; padding-bottom: 15px; }
+    .back-link { color: #8b949e; text-decoration: none; display: inline-block; margin-bottom: 20px; }
+    .back-link:hover { color: #58a6ff; }
+    .level-card {
+      background: #161b22; border: 1px solid #30363d; padding: 25px; margin-bottom: 20px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; transition: 0.3s;
+    }
+    .level-card:hover { border-color: #58a6ff; transform: translateX(5px); }
+    .level-info h3 { margin: 0 0 10px 0; color: #c9d1d9; }
+    .badge-diff { background: #21262d; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; border: 1px solid #30363d; }
+    .points { color: #238636; font-weight: bold; margin-left: 10px; }
+    .btn-start { background: #238636; color: white; text-decoration: none; padding: 10px 25px; border-radius: 5px; font-weight: bold; }
+    .btn-start:hover { background: #2ea043; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <a href="/Home" class="back-link"><i class="fas fa-arrow-left"></i> Retour au Dashboard</a>
+  <h1>Module : <span th:text="${categoryName}">SQL</span></h1>
+
+  <div th:each="challenge : ${challenges}" class="level-card">
+    <div class="level-info">
+      <h3 th:text="${challenge.title}">Titre</h3>
+      <div>
+        <span class="badge-diff" th:text="${challenge.difficulty}">Diff</span>
+        <span class="points" th:text="'+ ' + ${challenge.points} + ' PTS'"></span>
+      </div>
+    </div>
+    <a th:href="@{'/mission/' + ${challenge.attId}}" class="btn-start">ACCÉDER</a>
+  </div>
+</div>
+</body>
+</html>
