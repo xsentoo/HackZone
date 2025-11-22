@@ -1,26 +1,32 @@
 package com.uphf.HackZone.Entity;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDate;
 
 @Entity
 @Table(name="UserHack")
-
-
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int userId ;
-    private String userName ;
+    private int userId;
+
+    private String userName;
     private String userMail;
     private String userPWD;
     private String level;
     private String userBadge;
+
     @Column(name="userDate")
     private LocalDate userDate;
 
-    public UserEntity(int userId, String userName, String userMail, String userPWD, String level, String userBadge, LocalDate userDate) {
+
+    @Column(name = "point")
+    private int point = 0;
+
+    public UserEntity() {
+    }
+
+    public UserEntity(int userId, String userName, String userMail, String userPWD, String level, String userBadge, LocalDate userDate, int point) {
         this.userId = userId;
         this.userName = userName;
         this.userMail = userMail;
@@ -28,11 +34,10 @@ public class UserEntity {
         this.level = level;
         this.userBadge = userBadge;
         this.userDate = userDate;
+        this.point = point;
     }
 
-    public UserEntity() {
 
-    }
 
     public int getUserId() {
         return userId;
@@ -88,5 +93,14 @@ public class UserEntity {
 
     public void setUserDate(LocalDate userDate) {
         this.userDate = userDate;
+    }
+
+    // --- GETTERS/SETTERS POUR LES POINTS ---
+    public int getPoint() {
+        return point;
+    }
+
+    public void setPoint(int point) {
+        this.point = point;
     }
 }
