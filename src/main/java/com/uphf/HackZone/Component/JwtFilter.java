@@ -28,7 +28,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String token = null;
 
-        // LOG 1 : On voit si on passe dans le filtre
+
         System.out.println("--- Filtre JWT : Vérification de la requête " + request.getRequestURI());
 
         if (request.getCookies() != null) {
@@ -44,7 +44,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
-                // LOG 2 : On essaie d'extraire l'email
+
                 String userMail = jwtUtil.extractUserMail(token);
                 System.out.println("--- Filtre JWT : Mail extrait du token -> " + userMail);
 
@@ -57,7 +57,7 @@ public class JwtFilter extends OncePerRequestFilter {
                     System.out.println("--- Filtre JWT : Token invalide !");
                 }
             } catch (Exception e) {
-                // LOG 3 : Si JwtUtil plante (ex: Jws vs Jwt), on le verra ici !
+
                 System.out.println("--- ERREUR FATALE DANS LE FILTRE : " + e.getMessage());
                 e.printStackTrace();
             }
