@@ -95,4 +95,20 @@ public class HomeController {
         }
         return false; // Pas de changement
     }
+    @GetMapping("/Leaderboard")
+    public String showLeaderboardPage(Model model) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userMail = auth.getName();
+        userRepository.findByUserMail(userMail).ifPresent(u -> model.addAttribute("currentUser", u));
+
+
+        List<UserEntity> allPlayers = userRepository.findAll(
+                org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "point")
+        );
+
+        model.addAttribute("leaderboard", allPlayers);
+
+        return "Leaderboard"; // Cela va ouvrir src/main/resources/templates/Leaderboard.html
+    }
 }
