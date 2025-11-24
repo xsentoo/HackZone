@@ -25,12 +25,19 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/Auth/**", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/Auth/**", "/css/**", "/js/**", "/images/**" ,"/v3/api-docs/**","/swagger-ui/**", "/swagger-ui.html" , "/error" ).permitAll()
                         .anyRequest().authenticated()
                 )
+                .logout(logout->logout
+                        .logoutUrl("/logout")
+                        .deleteCookies("Authorization")
+                        .logoutSuccessUrl("/Auth/login")
+                        .permitAll())
+
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.sendRedirect("/Auth/login");
+
                         })
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

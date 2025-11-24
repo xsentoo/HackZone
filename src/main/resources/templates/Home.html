@@ -156,7 +156,7 @@
             </h3>
             <table class="mini-table">
                 <tr th:each="player, iterStat : ${leaderboard}">
-                    <td class="rank-num" th:classappend="_{iterStat.count == 1} ? 'rank-1' : ''" th:text="${iterStat.count}">1</td>
+                    <td class="rank-num" th:classappend="${iterStat.count == 1} ? 'rank-1' : ''" th:text="${iterStat.count}">1</td>
                     <td th:text="${player.userName}" th:style="${player.userName == user.userName} ? 'color:white; font-weight:bold;' : ''">Nom</td>
                     <td class="user-points" th:text="${player.point}">0</td>
                 </tr>
