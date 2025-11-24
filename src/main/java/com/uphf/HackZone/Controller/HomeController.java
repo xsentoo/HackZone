@@ -28,8 +28,17 @@ public class HomeController {
 
         if (userOpt.isPresent()) {
             UserEntity user = userOpt.get();
+
+
+            boolean hasChanged = checkLevelConsistency(user);
+            if (hasChanged) {
+                userRepository.save(user); // On sauvegarde le nouveau niveau en BDD
+            }
+            // --------------------------------------------------
+
             model.addAttribute("user", user);
 
+            // Calcul pour la barre de progression
             int score = user.getPoint();
             int nextLevelScore = 500;
 
@@ -48,6 +57,7 @@ public class HomeController {
             model.addAttribute("nextLevelScore", nextLevelScore);
             model.addAttribute("progressPercent", percent);
 
+            // Gestion du classement
             List<UserEntity> leaderboard = userRepository.findTop10ByOrderByPointDesc();
             if (leaderboard.size() > 5) {
                 leaderboard = leaderboard.subList(0, 5);
@@ -57,5 +67,32 @@ public class HomeController {
             return "Home";
         }
         return "redirect:/Auth/login";
+    }
+
+    // --- Méthode utilitaire pour vérifier le niveau ---
+    private boolean checkLevelConsistency(UserEntity user) {
+        int p = user.getPoint();
+        String currentLevel = user.getLevel();
+        String newLevel = currentLevel;
+        String newBadge = user.getUserBadge();
+
+        if (p >= 1500) {
+            newLevel = "avan";
+            newBadge = "Master Hacker";
+        } else if (p >= 500) {
+            newLevel = "int";
+            newBadge = "Script Kiddie";
+        } else {
+            newLevel = "deb";
+            newBadge = "Novice";
+        }
+
+
+        if (!newLevel.equals(currentLevel)) {
+            user.setLevel(newLevel);
+            user.setUserBadge(newBadge);
+            return true;
+        }
+        return false; // Pas de changement
     }
 }

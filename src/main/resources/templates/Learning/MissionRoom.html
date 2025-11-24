@@ -1,53 +1,229 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="[http://www.thymeleaf.org](http://www.thymeleaf.org)">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Salle de Mission</title>
-  <link href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css)" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salle d'Opération | HackZone</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
   <style>
-    body { background: #0d1117; color: #c9d1d9; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-    .mission-box { width: 100%; max-width: 800px; background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #30363d; padding-bottom: 20px; }
-    h1 { margin: 0; color: #58a6ff; font-size: 1.8rem; }
-    .close-btn { color: #8b949e; text-decoration: none; font-size: 1.5rem; }
-    .briefing { background: #21262d; padding: 25px; border-left: 4px solid #58a6ff; margin-bottom: 40px; border-radius: 0 5px 5px 0; }
-    .briefing h3 { margin-top: 0; color: #c9d1d9; }
-    .briefing p { line-height: 1.6; color: #8b949e; }
-    .action-area { text-align: center; margin-bottom: 40px; }
-    .btn-launch { display: inline-block; background: #d29922; color: white; padding: 15px 40px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 1.2rem; transition: 0.3s; }
-    .btn-launch:hover { background: #e3b341; transform: scale(1.05); }
-    .validation-area { border-top: 1px solid #30363d; padding-top: 30px; text-align: center; }
-    input { background: #0d1117; border: 1px solid #30363d; color: white; padding: 12px; width: 300px; border-radius: 5px; margin-right: 10px; }
-    button { background: #238636; color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-    button:hover { background: #2ea043; }
+    /* --- VARIABLES (Cohérent avec le reste) --- */
+    :root {
+      --bg-dark: #0B0F19;
+      --bg-panel: #151A29;
+      --bg-input: #080b12;
+
+      --primary: #6366F1;
+      --primary-glow: rgba(99, 102, 241, 0.4);
+
+      --success: #10B981;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+
+      --border: rgba(255, 255, 255, 0.08);
+      --radius: 20px;
+    }
+
+    /* --- RESET & BODY --- */
+    body {
+      background-color: var(--bg-dark);
+      background-image: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.05), transparent 60%);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      margin: 0; padding: 0;
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh;
+    }
+
+    /* --- MODAL CONTAINER --- */
+    .mission-modal {
+      width: 100%;
+      max-width: 750px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+      animation: slideUp 0.4s ease-out;
+    }
+
+    /* Barre de progression décorative en haut */
+    .mission-modal::before {
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--success));
+    }
+
+    /* --- HEADER --- */
+    .modal-header {
+      padding: 30px 40px;
+      border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: flex-start;
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    .mission-meta { display: flex; flex-direction: column; gap: 5px; }
+
+    .status-badge {
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--warning); display: flex; align-items: center; gap: 6px;
+    }
+    .status-dot { width: 8px; height: 8px; background: var(--warning); border-radius: 50%; box-shadow: 0 0 8px var(--warning); }
+
+    h1 { margin: 0; font-size: 1.8rem; font-weight: 700; color: var(--text-main); }
+
+    .close-btn {
+      color: var(--text-muted); font-size: 1.5rem; transition: 0.2s;
+      background: rgba(255,255,255,0.05); width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center; border-radius: 50%;
+    }
+    .close-btn:hover { background: var(--danger); color: white; transform: rotate(90deg); }
+
+    /* --- CONTENT --- */
+    .modal-content { padding: 40px; }
+
+    /* Briefing Box */
+    .briefing-box {
+      background: rgba(255, 255, 255, 0.02);
+      border-left: 4px solid var(--primary);
+      padding: 20px 25px;
+      border-radius: 0 12px 12px 0;
+      margin-bottom: 40px;
+    }
+    .briefing-title { display: flex; align-items: center; gap: 10px; color: var(--text-main); font-weight: 600; margin-bottom: 10px; }
+    .briefing-text { color: var(--text-muted); line-height: 1.6; font-size: 0.95rem; margin: 0; }
+
+    /* Action Area (Launch) */
+    .action-area { text-align: center; margin-bottom: 45px; }
+
+    .btn-launch {
+      display: inline-flex; align-items: center; gap: 12px;
+      background: var(--primary);
+      color: white;
+      padding: 18px 50px;
+      text-decoration: none;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: 0.5px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .btn-launch:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+      background: #4F46E5;
+    }
+
+    .launch-hint { margin-top: 15px; color: var(--text-muted); font-size: 0.85rem; display: flex; justify-content: center; align-items: center; gap: 6px; }
+
+    /* Validation Area */
+    .validation-area {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 25px;
+      position: relative;
+    }
+
+    .validation-label {
+      position: absolute; top: -12px; left: 20px;
+      background: var(--bg-panel); padding: 0 10px;
+      font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;
+    }
+
+    .input-group { display: flex; gap: 10px; margin-top: 5px; }
+
+    input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid var(--border);
+      color: var(--success);
+      padding: 10px 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.1rem;
+      transition: 0.3s;
+    }
+    input:focus { outline: none; border-color: var(--success); }
+    input::placeholder { color: rgba(255,255,255,0.1); font-family: 'Plus Jakarta Sans'; font-size: 0.9rem; }
+
+    .btn-confirm {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      padding: 10px 25px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-confirm:hover { background: var(--success); color: #000; }
+
+    /* Animation */
+    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 600px) {
+      .mission-modal { width: 95%; }
+      .modal-header, .modal-content { padding: 25px; }
+      .btn-launch { width: 100%; justify-content: center; }
+    }
   </style>
 </head>
 <body>
-<div class="mission-box">
-  <div class="header">
-    <h1 th:text="${challenge.title}">Titre Mission</h1>
-    <a th:href="@{'/learn/' + ${challenge.category}}" class="close-btn"><i class="fas fa-times"></i></a>
-  </div>
 
-  <div class="briefing">
-    <h3><i class="fas fa-terminal"></i> Briefing</h3>
-    <p th:text="${challenge.description}">Description...</p>
-  </div>
+<div class="mission-modal">
 
-  <div class="action-area">
-    <a th:href="${challenge.targetUrl}" target="_blank" class="btn-launch">
-      <i class="fas fa-rocket"></i> DÉMARRER L'ENVIRONNEMENT CIBLE
+  <div class="modal-header">
+    <div class="mission-meta">
+      <div class="status-badge">
+        <div class="status-dot"></div> Mission en cours
+      </div>
+      <h1 th:text="${challenge.title}">Titre de la mission</h1>
+    </div>
+    <a th:href="@{'/learn/' + ${challenge.category}}" class="close-btn">
+      <i class="fas fa-times"></i>
     </a>
-    <p style="margin-top: 15px; color: #8b949e; font-size: 0.9rem;">(Ouvre le terminal cible dans un nouvel onglet)</p>
   </div>
 
-  <div class="validation-area">
-    <h3 style="color: #c9d1d9; margin-bottom: 20px;">Validation de mission</h3>
-    <form action="/validate-flag" method="post">
-      <input type="text" name="flagInput" placeholder="Entrez le Flag (ex: FLAG{...})" required>
-      <button type="submit">CONFIRMER</button>
-    </form>
+  <div class="modal-content">
+
+    <div class="briefing-box">
+      <div class="briefing-title"><i class="fas fa-terminal" style="color:var(--primary);"></i> Briefing Tactique</div>
+      <p class="briefing-text" th:text="${challenge.description}">
+        Description de la mission...
+      </p>
+    </div>
+
+    <div class="action-area">
+      <a th:href="${challenge.targetUrl}" target="_blank" class="btn-launch">
+        <i class="fas fa-rocket"></i> DÉPLOYER LA CIBLE
+      </a>
+      <div class="launch-hint">
+        <i class="fas fa-info-circle"></i> Ouvre l'environnement vulnérable dans un nouvel onglet
+      </div>
+    </div>
+
+    <div class="validation-area">
+      <div class="validation-label">Validation du Flag</div>
+      <form action="/validate-flag" method="post" class="input-group">
+        <span style="font-family: 'JetBrains Mono'; color: var(--text-muted); align-self: center; margin-right: 10px;">$</span>
+        <input type="text" name="flagInput" placeholder="Ex: FLAG{SQL_MASTER}" autocomplete="off" required>
+        <button type="submit" class="btn-confirm">SUBMIT</button>
+      </form>
+    </div>
+
   </div>
 </div>
+
 </body>
 </html>
