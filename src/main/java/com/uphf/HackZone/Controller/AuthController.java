@@ -68,6 +68,7 @@ public class AuthController {
           return "Register";
       }
 
+      //ici on peux pas utiliser Autowired parce que userEntity c'est pas un bean ca veux dire qui gere pas par spring
       UserEntity newUser = new UserEntity();
       newUser.setUserName(userName);
       newUser.setUserMail(userMail);
