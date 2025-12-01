@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion | HackZone</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background: #161b22;
+            padding: 30px;
+            border-radius: 10px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0 0 10px #000;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #58a6ff;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background: #0d1117;
+            color: #c9d1d9;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #238636;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #2ea043;
+        }
+
+        .error {
+            color: #ff6b6b;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-container">
+    <h2>Connexion</h2>
+
+    <form action="/Auth/login" method="post">
+        <input type="email" name="userMail" placeholder="Email" required>
+
+        <input type="password" name="userPWD" placeholder="Mot de passe" required>
+
+        <button type="submit">Se connecter</button>
+    </form>
+
+    <!-- Message d'erreur -->
+    <p class="error" th:text="${error}"></p>
+</div>
+
+</body>
+</html>

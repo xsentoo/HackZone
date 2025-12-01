@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Inscription | HackZone</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #0d1117; color: #c9d1d9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .login-container { background: #161b22; padding: 30px; border-radius: 10px; width: 350px; text-align: center; box-shadow: 0 0 10px #000; }
+    h2 { margin-bottom: 20px; color: #58a6ff; }
+    input { width: 100%; padding: 10px; margin: 10px 0; border: none; border-radius: 5px; background: #0d1117; color: #c9d1d9; box-sizing: border-box; }
+    button { width: 100%; padding: 10px; background: #238636; border: none; border-radius: 5px; color: white; cursor: pointer; margin-top: 10px; }
+    button:hover { background: #2ea043; }
+    .error { color: #ff6b6b; margin-top: 10px; }
+    a { color: #58a6ff; text-decoration: none; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+
+<div class="login-container">
+  <h2>Rejoindre HackZone</h2>
+
+  <form action="/Auth/register" method="post">
+    <input type="text" name="userName" placeholder="Nom d'utilisateur" required>
+
+    <input type="email" name="userMail" placeholder="Email" required>
+
+    <input type="password" name="userPWD" placeholder="Mot de passe" required>
+
+    <button type="submit">S'inscrire</button>
+  </form>
+
+  <p class="error" th:text="${error}"></p>
+
+  <p>Déjà un compte ? <a href="/Auth/login">Se connecter</a></p>
+</div>
+
+</body>
+</html>
