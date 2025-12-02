@@ -17,6 +17,19 @@ INSERT IGNORE INTO Users (username, password, secret_data) VALUES
 ('admin', 'admin123', 'FLAG{SQL_LEVEL_1_COMPLETED}'),
 ('client', '1234', 'Solde: 0 EUR');
 
+-- --- AJOUT POUR LE NIVEAU 3 (XSS STOCKÉ - ISOLÉ) ---
+
+-- On supprime l'ancienne table pour ajouter la colonne session_id
+DROP TABLE IF EXISTS Comments;
+
+CREATE TABLE IF NOT EXISTS Comments (
+                                        id INT AUTO_INCREMENT PRIMARY KEY,
+                                        content TEXT,
+                                        session_id VARCHAR(255), -- ID de session pour l'isolation
+    author VARCHAR(50) DEFAULT 'Anonyme',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
 -- --- AJOUT POUR LE NIVEAU 2 (SQL UNION) ---
 
 -- 1. Une table normale (Les Produits) - SANS ACCENTS
@@ -64,7 +77,6 @@ CREATE TABLE IF NOT EXISTS UserHack (
     );
 
 -- Table 2 : Le Catalogue des Attaques (Challenges)
--- CORRECTION : "PRIMARYINATION" supprime, URLs mises a jour
 CREATE TABLE IF NOT EXISTS Attacks (
                                        attId INT AUTO_INCREMENT PRIMARY KEY,
                                        title VARCHAR(255) NOT NULL,
@@ -87,7 +99,7 @@ CREATE TABLE IF NOT EXISTS Solves (
     CONSTRAINT fk_attack FOREIGN KEY (attId) REFERENCES Attacks(attId) ON DELETE CASCADE
     );
 
--- Insertion des Challenges (Sans accents et avec les bons ports 8081)
+-- Insertion des Challenges
 INSERT IGNORE INTO Attacks (title, description, category, difficulty, target_url, flag, points) VALUES
 (
     'Injection SQL - Niveau 1',
@@ -105,6 +117,15 @@ INSERT IGNORE INTO Attacks (title, description, category, difficulty, target_url
     'int',
     'http://localhost:8081/shop',
     'FLAG{UNION_SELECT_IS_POWERFUL}',
+    100
+),
+(
+    'Faille XSS - Vol de Cookie',
+    'Le Livre d''Or n''est pas sécurisé. L''administrateur a caché un secret dans ses cookies. Trouvez un moyen de l''afficher (alert document.cookie).',
+    'XSS',
+    'deb',
+    'http://localhost:8081/guestbook',
+    'FLAG{XSS_MASTER_ALERT}',
     100
 );
 

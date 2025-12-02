@@ -3,6 +3,9 @@ package com.HackZone.TargetApp.Controller;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession; // Import essentiel
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,10 +14,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap; // Import ajouté !
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,20 +28,16 @@ public class VulnerableController {
     @PersistenceContext
     private EntityManager entityManager;
 
-    // --- PAGE DE LOGIN (Niveau 1) ---
+    // --- PAGE D'ACCUEIL (LOGIN) ---
     @GetMapping("/")
     public String loginPage(){
         return "login";
     }
 
-    // --- TRAITEMENT LOGIN VULNÉRABLE (Niveau 1) ---
+    // --- TRAITEMENT LOGIN (SQL INJECTION NIVEAU 1) ---
     @PostMapping("/login")
     public String login(@RequestParam String username, @RequestParam String password, Model model){
-
-        // Faille : Concaténation directe
         String sql = "SELECT * FROM Users WHERE username = '" + username + "' and password = '" + password + "'";
-
-        System.out.println("Requete login exécutée : " + sql);
 
         try {
             Query query = entityManager.createNativeQuery(sql);
@@ -51,7 +51,6 @@ public class VulnerableController {
                 model.addAttribute("username" , name);
                 model.addAttribute("secret", secret);
                 return "dashboard";
-
             } else {
                 model.addAttribute("error", "Identifiants incorrects");
                 return "login";
@@ -62,27 +61,18 @@ public class VulnerableController {
         }
     }
 
-    // --- CHALLENGE 3 : SQL INJECTION NIVEAU 2 (UNION BASED) ---
+    // --- BOUTIQUE (SQL INJECTION NIVEAU 2 - UNION) ---
     @GetMapping("/shop")
     public String shopPage(@RequestParam(required = false, defaultValue = "Vêtements") String category, Model model) {
-
         List<Map<String, String>> products = new ArrayList<>();
         String error = null;
-
-
         String url = "jdbc:mysql://mysqldb:3306/TargetDB?allowPublicKeyRetrieval=true&useSSL=false";
-        String user = "root";
-        String password = "root";
 
-        try (Connection con = DriverManager.getConnection(url, user, password);
+        try (Connection con = DriverManager.getConnection(url, "root", "root");
              Statement stmt = con.createStatement()) {
 
-            // ⚠️ LA FAILLE EST ICI : Concaténation directe de 'category'
             String sql = "SELECT name, price FROM Products WHERE category = '" + category + "'";
-
-
             model.addAttribute("lastQuery", sql);
-
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
@@ -91,15 +81,72 @@ public class VulnerableController {
                 product.put("price", rs.getString(2));
                 products.add(product);
             }
-
         } catch (Exception e) {
-
             error = "Erreur SQL : " + e.getMessage();
         }
-
         model.addAttribute("products", products);
         model.addAttribute("error", error);
-
         return "shop";
+    }
+
+    // --- LIVRE D'OR (XSS STOCKÉ - ISOLÉ & AUTO-NETTOYANT) ---
+    @GetMapping("/guestbook")
+    public String guestbookPage(Model model, HttpServletResponse response, HttpSession session) {
+
+        // 1. LE FLAG (Dans le cookie)
+        Cookie flagCookie = new Cookie("flag", "FLAG{XSS_MASTER_ALERT}");
+        flagCookie.setHttpOnly(false); // Accessible via JS
+        flagCookie.setPath("/");
+        flagCookie.setMaxAge(3600);
+        response.addCookie(flagCookie);
+
+        String sessionId = session.getId();
+        List<String> comments = new ArrayList<>();
+        String url = "jdbc:mysql://mysqldb:3306/TargetDB?allowPublicKeyRetrieval=true&useSSL=false";
+
+        try (Connection con = DriverManager.getConnection(url, "root", "root")) {
+
+            // ÉTAPE A : On récupère les messages DE CET ÉTUDIANT
+            try (PreparedStatement pstmtSelect = con.prepareStatement("SELECT content FROM Comments WHERE session_id = ? ORDER BY id DESC")) {
+                pstmtSelect.setString(1, sessionId);
+                ResultSet rs = pstmtSelect.executeQuery();
+                while (rs.next()) {
+                    comments.add(rs.getString("content"));
+                }
+            }
+
+            // ÉTAPE B : AUTO-NETTOYAGE IMMÉDIAT
+            // On supprime les messages juste après les avoir récupérés.
+            // La page va s'afficher avec l'attaque, mais si on rafraîchit, ce sera propre.
+            try (PreparedStatement pstmtDelete = con.prepareStatement("DELETE FROM Comments WHERE session_id = ?")) {
+                pstmtDelete.setString(1, sessionId);
+                pstmtDelete.executeUpdate();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        model.addAttribute("comments", comments);
+        return "guestbook";
+    }
+
+    @PostMapping("/guestbook")
+    public String postComment(@RequestParam String content, HttpSession session) {
+        String url = "jdbc:mysql://mysqldb:3306/TargetDB?allowPublicKeyRetrieval=true&useSSL=false";
+        String sessionId = session.getId();
+
+        try (Connection con = DriverManager.getConnection(url, "root", "root");
+             PreparedStatement pstmt = con.prepareStatement("INSERT INTO Comments (content, session_id) VALUES (?, ?)")) {
+
+            pstmt.setString(1, content);
+            pstmt.setString(2, sessionId); // On associe le message à la session
+            pstmt.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "redirect:/guestbook";
     }
 }
